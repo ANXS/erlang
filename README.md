@@ -11,6 +11,7 @@ Ansible role which installs Erlang
 
 ```yaml
 erlang_version: "R16B03-1"
+erlang_build_flags: ""
 ```
 
 

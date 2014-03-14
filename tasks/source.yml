@@ -4,7 +4,7 @@
   apt:
     pkg: "{{item}}"
     state: present
-  with_items: ["libncurses5-dev", "openssl", "libssl-dev", " fop"]
+  with_items: ["libncurses5-dev", "openssl", "libssl-dev", "fop"]
 
 - name: Erlang | Download the erlang source
   get_url:
@@ -14,9 +14,11 @@
 - name: Erlang | Unplack the compressed erlang source
   command: tar -xvzf /tmp/otp_src_{{erlang_version}}.tar.gz chdir=/tmp creates=/tmp/otp_src_{{erlang_version}}/README.md
 
-- name: Erlang | Build erlang from source
-  command: {{item}} chdir=/tmp
-  with_items:
-    - "./configure {{erlang_build_flags}}"
-    - make
-    - make install
+- name: Erlang | Build erlang from source - pt. 1 (configure)
+  command: "./configure chdir=/tmp/otp_src_{{erlang_version}}"
+
+- name: Erlang | Build erlang from source - pt. 2 (make)
+  command: "make chdir=/tmp/otp_src_{{erlang_version}}"
+
+- name: Erlang | Build erlang from source - pt. 1 (make install)
+  command: "make install chdir=/tmp/otp_src_{{erlang_version}}"
