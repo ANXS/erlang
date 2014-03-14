@@ -1,0 +1,3 @@
+# file: erlang/tasks/main.yml
+
+- include: source.yml
