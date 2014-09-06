@@ -2,7 +2,7 @@
 
 galaxy_info:
   author: pjan vandaele
-  company: Ansibles
+  company: ANXS
   description: Install erlang
   min_ansible_version: 1.4
   license: MIT
@@ -14,4 +14,4 @@ galaxy_info:
   - system
 
 dependencies:
-  - Ansibles.build-essential
+  - ANXS.build-essential
