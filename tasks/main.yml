@@ -1,3 +1,7 @@
 # file: erlang/tasks/main.yml
 
 - include: source.yml
+  when: erlang_install_method == "source"
+
+- include: package.yml
+  when: erlang_install_method == "package"
