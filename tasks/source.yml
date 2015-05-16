@@ -25,7 +25,7 @@
   command: "make chdir=/tmp/otp_src_{{erlang_version}}"
   when: erlang_downloaded.changed
 
-- name: Erlang | Build erlang from source - pt. 1 (make install)
+- name: Erlang | Build erlang from source - pt. 3 (make install)
   sudo: true
   command: "make install chdir=/tmp/otp_src_{{erlang_version}}"
   when: erlang_downloaded.changed
