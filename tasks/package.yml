@@ -1,0 +1,19 @@
+---
+# file: tasks/package.yml
+
+- name: Erlang | Add repo key
+  sudo: yes
+  apt_key:
+    url: "http://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc"
+
+- name: Erlang | Add package to apt
+  sudo: true
+  apt_repository:
+    repo: "deb http://packages.erlang-solutions.com/ubuntu trusty contrib"
+    update_cache: "yes"
+
+- name: Erlang | Install Erlang package
+  sudo: true
+  apt:
+    pkg: "erlang"
+    state: "latest"
