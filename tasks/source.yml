@@ -3,8 +3,10 @@
 - name: Erlang | Make sure the build dependencies are installed
   sudo: true
   apt:
-    pkg: "{{item}}"
-    state: present
+    pkg="{{item}}"
+    state=present
+    update_cache=yes
+    cache_valid_time=3600
   with_items: ["libncurses5-dev", "openssl", "libssl-dev", "fop"]
 
 - name: Erlang | Download the erlang source
