@@ -1,0 +1,5 @@
+erlang_deps:
+  - "libncurses5-dev"
+  - "openssl"
+  - "libssl-dev"
+  - "fop"
