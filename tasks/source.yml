@@ -8,13 +8,12 @@
     update_cache: yes
     cache_valid_time: 3600
   with_items: "{{erlang_deps}}"
-
+  when: ansible_os_family == 'Debian'
 - name: Erlang | Download the erlang source
   get_url:
     url: "http://erlang.org/download/otp_src_{{erlang_version}}.tar.gz"
     dest: "{{erlang_cache_path}}/otp_src_{{erlang_version}}.tar.gz"
   register: erlang_downloaded
-
 - name: Erlang | Unpack the compressed erlang source
   command: >
     tar -xvzf {{erlang_cache_path}}/otp_src_{{erlang_version}}.tar.gz
