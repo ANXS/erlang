@@ -1,7 +1,7 @@
 # file: erlang/tasks/source.yml
 
 - name: Erlang | Make sure the build dependencies are installed
-  sudo: true
+  become: true
   apt:
     pkg: "{{item}}"
     state: present
@@ -22,7 +22,7 @@
   when: erlang_downloaded.changed
 
 - name: Erlang | Build erlang from source - pt. 1 (configure)
-  command: "./configure chdir={{erlang_cache_path}}/otp_src_{{erlang_version}}"
+  command: "./configure --prefix={{erlang_path}} chdir={{erlang_cache_path}}/otp_src_{{erlang_version}}"
   when: erlang_downloaded.changed
 
 - name: Erlang | Build erlang from source - pt. 2 (make)
@@ -30,6 +30,5 @@
   when: erlang_downloaded.changed
 
 - name: Erlang | Build erlang from source - pt. 3 (make install)
-  sudo: true
   command: "make install chdir={{erlang_cache_path}}/otp_src_{{erlang_version}}"
   when: erlang_downloaded.changed
