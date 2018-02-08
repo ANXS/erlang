@@ -17,6 +17,7 @@ install:
 
 script:
   - echo localhost > inventory
+  - sudo mkdir -p /var/cache
   - ansible-playbook -i inventory test.yml --syntax-check
   - ansible-playbook -i inventory test.yml --connection=local --sudo
   - >
