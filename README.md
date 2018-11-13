@@ -4,13 +4,13 @@ Ansible role which installs Erlang
 
 
 #### Requirements & Dependencies
-- Tested on Ansible 1.4 or higher.
+- Tested on Ansible 2.3 or higher.
 
 
 #### Variables
 
 ```yaml
-erlang_version: "R16B03-1"
+erlang_version: "R18.1"
 erlang_build_flags: ""
 ```
 

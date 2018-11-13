@@ -3,11 +3,10 @@
 - name: Erlang | Make sure the build dependencies are installed
   become: true
   apt:
-    pkg: "{{item}}"
+    pkg: "{{erlang_deps}}"
     state: present
     update_cache: yes
     cache_valid_time: 3600
-  with_items: "{{erlang_deps}}"
   when: ansible_os_family == 'Debian'
 - name: Erlang | Download the erlang source
   get_url:

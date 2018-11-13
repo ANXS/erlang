@@ -6,7 +6,7 @@
   ignore_errors: yes
   changed_when: >
     current_erlang_version.rc != 0
-    or current_erlang_version.stdout != "{{erlang_version}}"
+    or current_erlang_version.stdout != erlang_version
 - include: source.yml
   when: current_erlang_version.changed
 - name: Erlang | Persist current version
