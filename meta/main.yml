@@ -1,5 +1,4 @@
-# file: erlang/meta/main.yml
-
+---
 galaxy_info:
   author: pjan vandaele
   company: ANXS

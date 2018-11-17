@@ -1,0 +1,18 @@
+---
+- name: "Check if the rebar version is already installed"
+  command: "cat {{erlang_rebar_cache_version}}"
+  register: current_rebar_version
+  ignore_errors: yes
+  changed_when: >
+    current_rebar_version.rc != 0
+    or current_rebar_version.stdout != erlang_rebar_version
+- name: "install rebar3"
+  when: 'ansible_os_family == "Debian" and "development" in dotfile_contexts'
+  get_url:
+    url: "{{erlang_rebar_url}}"
+    dest: "{{erlang_rebar_path}}/rebar3"
+    mode: "0700"
+- name: "Persist current rebar version"
+  copy:
+    dest: "{{erlang_rebar_cache_version}}"
+    content: "{{erlang_rebar_version}}"
