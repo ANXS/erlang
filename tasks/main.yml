@@ -10,7 +10,7 @@
   when: current_erlang_version.changed
 - name: "Persist current version"
   copy:
-    dest: "{{erlang_cache_path}}/anxs-erlang-version"
+    dest: "{{erlang_cache_version}}"
     content: "{{erlang_version}}"
 - include: rebar.yml
   when: erlang_rebar

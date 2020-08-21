@@ -7,3 +7,4 @@ erlang_deps:
 erlang_rebar_url: "https://github.com/erlang/rebar3/releases/download/{{erlang_rebar_version}}/rebar3"
 erlang_cache_version: "{{erlang_cache_path}}/{{erlang_cache_file}}"
 erlang_rebar_cache_version: "{{erlang_cache_path}}/{{erlang_rebar_cache_file}}"
+erlang_cache_archive: "{{erlang_cache_path}}/otp_src_{{erlang_version}}.tar.gz"
