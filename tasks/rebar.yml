@@ -6,6 +6,11 @@
   changed_when: >
     current_rebar_version.rc != 0
     or current_rebar_version.stdout != erlang_rebar_version
+- name: "ensure path exists"
+  file:
+    path: "{{erlang_rebar_path}}"
+    state: "directory"
+    mode: "0700"
 - name: "install rebar3"
   get_url:
     url: "{{erlang_rebar_url}}"
