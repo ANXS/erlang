@@ -4,7 +4,12 @@ erlang_build_flags: ""
 erlang_path: "/usr/local"
 erlang_cache_path: "/var/cache"
 erlang_cache_file: "anxs-erlang-version"
-erlang_rebar: no
+erlang_rebar: false
 erlang_rebar_version: "3.8.0"
 erlang_rebar_cache_file: "anxs-rebar-version"
 erlang_rebar_path: "/usr/local/bin"
+erlang_directory_mode: "0770"
+erlang_exec_mode: "0770"
+erlang_file_mode: "0660"
+erlang_user: "root"
+erlang_group: "root"

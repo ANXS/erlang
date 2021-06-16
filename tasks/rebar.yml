@@ -2,16 +2,24 @@
 - name: "Check if the rebar version is already installed"
   command: "cat {{erlang_rebar_cache_version}}"
   register: current_rebar_version
-  ignore_errors: yes
+  ignore_errors: true
   changed_when: >
     current_rebar_version.rc != 0
     or current_rebar_version.stdout != erlang_rebar_version
+
+- name: "ensure path exists"
+  file:
+    path: "{{erlang_rebar_path}}"
+    state: "directory"
+    mode: "{{erlang_directory_mode}}"
+
 - name: "install rebar3"
   get_url:
     url: "{{erlang_rebar_url}}"
     dest: "{{erlang_rebar_path}}/rebar3"
-    mode: "0700"
+    mode: "{{erlang_exec_mode}}"
     force: "{{current_rebar_version.changed}}"
+
 - name: "Persist current rebar version"
   copy:
     dest: "{{erlang_rebar_cache_version}}"

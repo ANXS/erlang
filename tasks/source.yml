@@ -3,27 +3,48 @@
   become: true
   apt:
     pkg: "{{erlang_deps}}"
-    state: present
-    update_cache: yes
-    cache_valid_time: 3600
+    state: "present"
+    update_cache: true
+    cache_valid_time: "3600"
   when: ansible_os_family == 'Debian'
+
 - name: "Download the erlang source"
   get_url:
     url: "http://erlang.org/download/otp_src_{{erlang_version}}.tar.gz"
     dest: "{{erlang_cache_path}}/otp_src_{{erlang_version}}.tar.gz"
+    owner: "{{erlang_user}}"
+    group: "{{erlang_group}}"
+    mode: "{{erlang_file_mode}}"
   register: erlang_downloaded
+
 - name: "Unpack the compressed erlang source"
-  command: >
-    tar -xvzf {{erlang_cache_path}}/otp_src_{{erlang_version}}.tar.gz
-    chdir={{erlang_cache_path}}
-    creates={{erlang_cache_path}}/otp_src_{{erlang_version}}/README.md
+  unarchive:
+    src: "{{erlang_cache_path}}/otp_src_{{erlang_version}}.tar.gz"
+    dest: "{{erlang_cache_path}}"
+    creates: "{{erlang_cache_path}}/otp_src_{{erlang_version}}/README.md"
+    owner: "{{erlang_user}}"
+    group: "{{erlang_group}}"
+    mode: "{{erlang_directory_mode}}"
   when: erlang_downloaded.changed
-- name: "Build erlang from source - pt. 1 (configure)"
-  command: "./configure --prefix={{erlang_path}} chdir={{erlang_cache_path}}/otp_src_{{erlang_version}}"
-  when: erlang_downloaded.changed
-- name: "Build erlang from source - pt. 2 (make)"
-  command: "make chdir={{erlang_cache_path}}/otp_src_{{erlang_version}}"
-  when: erlang_downloaded.changed
-- name: "Build erlang from source - pt. 3 (make install)"
-  command: "make install chdir={{erlang_cache_path}}/otp_src_{{erlang_version}}"
-  when: erlang_downloaded.changed
+
+- name: "Build Erlang from Source"
+  become: true
+  become_user: "{{erlang_user}}"
+  block:
+    - name: "Build erlang from source - pt. 1 (configure)"
+      command: "./configure --prefix={{erlang_path}}"
+      args:
+        chdir: "{{erlang_cache_path}}/otp_src_{{erlang_version}}"
+      when: erlang_downloaded.changed
+
+    - name: "Build erlang from source - pt. 2 (make)"
+      command: "make"
+      args:
+        chdir: "{{erlang_cache_path}}/otp_src_{{erlang_version}}"
+      when: erlang_downloaded.changed
+
+    - name: "Build erlang from source - pt. 3 (make install)"
+      command: "make install"
+      args:
+        chdir: "{{erlang_cache_path}}/otp_src_{{erlang_version}}"
+      when: erlang_downloaded.changed

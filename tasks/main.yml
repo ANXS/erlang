@@ -2,15 +2,21 @@
 - name: "Check if the Erlang version is already installed"
   command: "cat {{erlang_cache_version}}"
   register: current_erlang_version
-  ignore_errors: yes
+  ignore_errors: true
   changed_when: >
     current_erlang_version.rc != 0
     or current_erlang_version.stdout != erlang_version
-- include: source.yml
+
+- include: "source.yml"
   when: current_erlang_version.changed
+
 - name: "Persist current version"
   copy:
     dest: "{{erlang_cache_path}}/anxs-erlang-version"
     content: "{{erlang_version}}"
-- include: rebar.yml
+    owner: "{{erlang_user}}"
+    group: "{{erlang_group}}"
+    mode: "{{erlang_file_mode}}"
+
+- include: "rebar.yml"
   when: erlang_rebar
