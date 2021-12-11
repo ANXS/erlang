@@ -19,6 +19,9 @@
     dest: "{{erlang_rebar_path}}/rebar3"
     mode: "{{erlang_exec_mode}}"
     force: "{{current_rebar_version.changed}}"
+    owner: "{{erlang_user}}"
+    group: "{{erlang_group}}"
+
 
 - name: "Persist current rebar version"
   copy:
