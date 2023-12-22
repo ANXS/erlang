@@ -7,7 +7,7 @@
     current_erlang_version.rc != 0
     or current_erlang_version.stdout != erlang_version
 
-- include: "source.yml"
+- include_tasks: "source.yml"
   when: current_erlang_version.changed
 
 - name: "Persist current version"
@@ -18,5 +18,5 @@
     group: "{{erlang_group}}"
     mode: "{{erlang_file_mode}}"
 
-- include: "rebar.yml"
+- include_tasks: "rebar.yml"
   when: erlang_rebar
