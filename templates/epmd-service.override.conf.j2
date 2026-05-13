@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+# epmd reads these env vars natively; no ExecStart override needed.
+[Service]
+Environment=ERL_EPMD_ADDRESS={{ erlang_epmd_listen_address }}
+Environment=ERL_EPMD_PORT={{ erlang_epmd_port }}

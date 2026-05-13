@@ -1,7 +1,0 @@
-- hosts: all
-  become: true
-  vars_files:
-    - 'defaults/main.yml'
-    - 'vars/main.yml'
-  tasks:
-    - include: 'tasks/main.yml'

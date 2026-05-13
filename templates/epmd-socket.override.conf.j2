@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+[Socket]
+ListenStream=
+ListenStream={{ erlang_epmd_listen_address }}:{{ erlang_epmd_port }}

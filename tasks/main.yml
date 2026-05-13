@@ -1,16 +1,20 @@
 ---
-- name: "Check if the Erlang version is already installed"
-  command: "cat {{erlang_cache_version}}"
-  register: current_erlang_version
-  ignore_errors: yes
-  changed_when: >
-    current_erlang_version.rc != 0
-    or current_erlang_version.stdout != erlang_version
-- include: source.yml
-  when: current_erlang_version.changed
-- name: "Persist current version"
-  copy:
-    dest: "{{erlang_cache_path}}/anxs-erlang-version"
-    content: "{{erlang_version}}"
-- include: rebar.yml
+- name: "Ensure cache directory exists"
+  become: true
+  ansible.builtin.file:
+    path: "{{ erlang_cache_path }}"
+    state: directory
+    owner: "{{ erlang_user }}"
+    group: "{{ erlang_group }}"
+    mode: "0755"
+
+- name: "Install Erlang via packages"
+  ansible.builtin.include_tasks: package.yml
+
+- name: "Manage EPMD lifecycle"
+  ansible.builtin.include_tasks: epmd.yml
+  when: erlang_epmd_managed
+
+- name: "Install rebar3"
+  ansible.builtin.include_tasks: rebar.yml
   when: erlang_rebar

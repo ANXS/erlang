@@ -1,0 +1,39 @@
+---
+- name: "Install python3-debian (required by deb822_repository)"
+  become: true
+  ansible.builtin.apt:
+    name: python3-debian
+    state: present
+
+- name: "Configure RabbitMQ Erlang apt repository"
+  become: true
+  ansible.builtin.deb822_repository:
+    name: rabbitmq-erlang
+    types: deb
+    uris: "{{ erlang_repo_base_url }}/{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}"
+    suites:
+      - "{{ ansible_distribution_release }}"
+    components:
+      - main
+    architectures: amd64
+    signed_by: "{{ erlang_repo_gpg_url }}"
+  notify: "Update apt cache"
+
+- name: "Pin Erlang packages to RabbitMQ repository"
+  become: true
+  ansible.builtin.copy:
+    dest: "/etc/apt/preferences.d/erlang"
+    content: |
+      Package: erlang*
+      Pin: origin deb1.rabbitmq.com
+      Pin-Priority: 1000
+    mode: "0644"
+
+- name: "Flush handlers to update apt cache before install"
+  ansible.builtin.meta: flush_handlers
+
+- name: "Install Erlang packages"
+  become: true
+  ansible.builtin.apt:
+    pkg: "{{ erlang_packages }}"
+    state: present

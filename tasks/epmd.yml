@@ -1,0 +1,120 @@
+---
+- name: "EPMD: refuse non-loopback listen address without explicit latch"
+  ansible.builtin.fail:
+    msg: |-
+      erlang_epmd_listen_address is set to '{{ erlang_epmd_listen_address }}'
+      which is not a loopback address. Cross-host epmd exposure requires
+      explicit opt-in via erlang_epmd_allow_remote: true. Refusing to
+      configure epmd to bind a non-loopback address by default.
+  when:
+    - erlang_epmd_listen_address not in ['127.0.0.1', 'localhost', '::1', '::ffff:127.0.0.1']
+    - not erlang_epmd_allow_remote
+
+- name: "EPMD: query epmd.socket unit state"
+  ansible.builtin.systemd:
+    name: epmd.socket
+  register: erlang_epmd_socket_state
+  changed_when: false
+
+- name: "EPMD: query epmd.service unit state"
+  ansible.builtin.systemd:
+    name: epmd.service
+  register: erlang_epmd_service_state
+  changed_when: false
+
+- name: "EPMD: record which unit kinds are shipped"
+  ansible.builtin.set_fact:
+    erlang_epmd_socket_present: >-
+      {{ (erlang_epmd_socket_state.status | default({})).get('LoadState', 'not-found') != 'not-found' }}
+    erlang_epmd_service_present: >-
+      {{ (erlang_epmd_service_state.status | default({})).get('LoadState', 'not-found') != 'not-found' }}
+
+- name: "EPMD: pick effective unit kind (preferred, with fallback)"
+  ansible.builtin.set_fact:
+    erlang_epmd_effective_kind: >-
+      {{ 'socket' if (erlang_epmd_unit_kind == 'socket' and erlang_epmd_socket_present) else
+         'service' if (erlang_epmd_unit_kind == 'service' and erlang_epmd_service_present) else
+         'socket' if erlang_epmd_socket_present else
+         'service' if erlang_epmd_service_present else
+         'none' }}
+
+- name: "EPMD: warn when falling back to a non-preferred unit kind"
+  ansible.builtin.debug:
+    msg: |-
+      erlang_epmd_unit_kind={{ erlang_epmd_unit_kind }} requested but the
+      preferred unit is not shipped on this host. Falling back to
+      epmd.{{ erlang_epmd_effective_kind }}.
+  when:
+    - erlang_epmd_effective_kind != 'none'
+    - erlang_epmd_effective_kind != erlang_epmd_unit_kind
+
+- name: "EPMD: no shipped unit -- skipping management as no-op"
+  ansible.builtin.debug:
+    msg: |-
+      No epmd.socket or epmd.service unit is shipped on this host.
+      Set erlang_epmd_managed: false to silence this notice.
+  when: erlang_epmd_effective_kind == 'none'
+
+- name: "EPMD: ensure drop-in directory exists"
+  become: true
+  ansible.builtin.file:
+    path: "/etc/systemd/system/epmd.{{ erlang_epmd_effective_kind }}.d"
+    state: directory
+    mode: "0755"
+  when: erlang_epmd_effective_kind != 'none'
+
+- name: "EPMD: write socket drop-in"
+  become: true
+  ansible.builtin.template:
+    src: "epmd-socket.override.conf.j2"
+    dest: "/etc/systemd/system/epmd.socket.d/anxs-erlang.conf"
+    mode: "0644"
+  register: erlang_epmd_socket_dropin
+  when: erlang_epmd_effective_kind == 'socket'
+
+- name: "EPMD: write service drop-in"
+  become: true
+  ansible.builtin.template:
+    src: "epmd-service.override.conf.j2"
+    dest: "/etc/systemd/system/epmd.service.d/anxs-erlang.conf"
+    mode: "0644"
+  register: erlang_epmd_service_dropin
+  when: erlang_epmd_effective_kind == 'service'
+
+- name: "EPMD: mask the competing socket when running in service mode"
+  become: true
+  ansible.builtin.systemd:
+    name: epmd.socket
+    enabled: false
+    state: stopped
+    masked: true
+  when:
+    - erlang_epmd_effective_kind == 'service'
+    - erlang_epmd_socket_present
+
+- name: "EPMD: enable and start the chosen unit (restart if drop-in changed)"
+  become: true
+  ansible.builtin.systemd:
+    name: "epmd.{{ erlang_epmd_effective_kind }}"
+    enabled: true
+    state: >-
+      {{ 'restarted'
+         if (erlang_epmd_socket_dropin.changed | default(false))
+            or (erlang_epmd_service_dropin.changed | default(false))
+         else 'started' }}
+    daemon_reload: true
+  when: erlang_epmd_effective_kind != 'none'
+
+- name: "EPMD: verify epmd is reachable"
+  ansible.builtin.command:
+    cmd: "epmd -names"
+  register: erlang_epmd_names_check
+  changed_when: false
+  when: erlang_epmd_effective_kind != 'none'
+
+- name: "EPMD: report registered nodes"
+  ansible.builtin.debug:
+    msg: "{{ erlang_epmd_names_check.stdout_lines | default([]) }}"
+  when:
+    - erlang_epmd_effective_kind != 'none'
+    - erlang_epmd_names_check.stdout is defined

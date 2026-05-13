@@ -1,17 +1,26 @@
 ---
 galaxy_info:
-  author: pjan vandaele
+  role_name: "erlang"
+  namespace: "anxs"
+  author: "ANXS crew"
   company: ANXS
-  description: Install erlang
-  min_ansible_version: 2.3
+  description: "Install Erlang/OTP"
+  min_ansible_version: "2.15"
   license: MIT
   platforms:
-  - name: Ubuntu
-    versions:
-    - all
-  categories:
-  - system
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+        - noble
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+        - trixie
+  galaxy_tags:
+    - erlang
+    - otp
+    - development
 
-dependencies:
-  - role: ANXS.build-essential
-    when: ansible_os_family == 'Debian'
+dependencies: []
