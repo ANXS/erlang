@@ -1,4 +1,13 @@
 ---
+- name: "Ensure rebar install directory exists"
+  become: true
+  ansible.builtin.file:
+    path: "{{ erlang_rebar_path }}"
+    state: directory
+    owner: "{{ erlang_user }}"
+    group: "{{ erlang_group }}"
+    mode: "{{ erlang_directory_mode }}"
+
 - name: "Check if the rebar version is already installed"
   ansible.builtin.command:
     cmd: "cat {{ erlang_rebar_cache_version }}"
@@ -15,7 +24,7 @@
     dest: "{{ erlang_rebar_path }}/rebar3"
     owner: "{{ erlang_user }}"
     group: "{{ erlang_group }}"
-    mode: "0755"
+    mode: "{{ erlang_directory_mode }}"
     force: "{{ current_rebar_version.changed }}"
 
 - name: "Persist current rebar version"
@@ -25,4 +34,4 @@
     content: "{{ erlang_rebar_version }}"
     owner: "{{ erlang_user }}"
     group: "{{ erlang_group }}"
-    mode: "0644"
+    mode: "{{ erlang_file_mode }}"

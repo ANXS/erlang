@@ -6,7 +6,7 @@
     state: directory
     owner: "{{ erlang_user }}"
     group: "{{ erlang_group }}"
-    mode: "0755"
+    mode: "{{ erlang_directory_mode }}"
 
 - name: "Install Erlang via packages"
   ansible.builtin.include_tasks: package.yml

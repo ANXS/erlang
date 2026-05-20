@@ -6,6 +6,8 @@ erlang_user: "root"
 erlang_group: "root"
 
 erlang_cache_path: "/var/cache/anxs-erlang"
+erlang_directory_mode: "0755"
+erlang_file_mode: "0644"
 
 erlang_rebar: false
 erlang_rebar_version: "3.27.0"
