@@ -115,6 +115,7 @@
 - name: "EPMD: report registered nodes"
   ansible.builtin.debug:
     msg: "{{ erlang_epmd_names_check.stdout_lines | default([]) }}"
+    verbosity: 1
   when:
     - erlang_epmd_effective_kind != 'none'
     - erlang_epmd_names_check.stdout is defined
